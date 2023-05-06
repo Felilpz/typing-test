@@ -3,7 +3,7 @@ const entrada = document.getElementById('input-text')
 const reiniciar = document.getElementById('btn-resetar')
 const resultado = document.getElementById('tempo')
 const historico = document.getElementById('historico')
-const alterarTema = document.getElementById('btn-tema')
+const alterarTema = document.querySelector('#btn-tema')
 
 // adicionar api para gerar textos dps.
 
@@ -28,7 +28,7 @@ function novoTexto() {
 // evento a cada tecla digitada
 function atualizarTeste() {
     iniciar()
-    if(entrada.value === texto.textContent) {
+    if (entrada.value === texto.textContent) {
         verificar()
     }
 }
@@ -36,7 +36,7 @@ function atualizarTeste() {
 function iniciar() {
     const statusDoTeste = JSON.parse(localStorage.getItem('testeEmAndamento'))
 
-    if(!statusDoTeste) {
+    if (!statusDoTeste) {
         localStorage.setItem('tempoInicial', new Date().getTime()) //Pega a data que o usuario começou a digitar para calcular o tempo dps
         localStorage.setItem('testeEmAndamento', true) //teste em andamento
     }
@@ -46,9 +46,9 @@ function verificar() {
     const tempoFinal = new Date().getTime()
     const tempoInicial = parseInt(localStorage.getItem('tempoInicial'))
     const tempoGasto = (tempoFinal - tempoInicial) / 1000
-    const resultado = document.getElementById('resultado')
-    resultado.innerHTML = 
-    `<p>
+    const resultadoA = document.getElementById('resultado')
+    resultadoA.innerHTML =
+        `<p>
         Parabens! você terminou em <span class="marcar">${tempoGasto} segundos</span>
     </p>`
 
@@ -61,15 +61,53 @@ function verificar() {
 
 function addHistorico(textoDigitado, tempoGasto) {
     const itemHistorico = document.createElement('p')
+    itemHistorico.innerHTML = `<span class="marcar">Texto: </span> "${textoDigitado}" // <span class="marcar">Tempo: </span>${tempoGasto}`
 
-    itemHistorico.innerHTML = `<span class="marcar">Texto: </span>${textoDigitado}`
-    itemHistorico.innerHTML += `<p><span class="marcar">Tempo: </span>${tempoGasto}</p>`
     historico.appendChild(itemHistorico)
-
-    const divHistorico = document.createElement('div')
-    const itens
 }
 
+function reiniciarTeste() {
+    const resultadoFinal = document.getElementById('resultado');
+    entrada.value = ""
+    resultadoFinal.textContent = ""
+    novoTexto()
+    localStorage.setItem("testeEmAndamento", false)
+    historico.innerHTML = ""
+}
+
+function alternarTema() {
+    const body = document.body;
+    body.classList.toggle("escuro");
+
+    const hSix = document.querySelector("h6");
+    const spanS = document.querySelectorAll('.marcar');
+
+    // Armazenar as cores atuais e anteriores do tema
+    let corAtual, corAnterior;
+    if (body.classList.contains("escuro")) {
+        corAtual = "#fff";
+        corAnterior = "#252525";
+    } else {
+        corAtual = "#252525";
+        corAnterior = "#fff";
+    }
+
+    // Alterar a cor do elemento h6
+    hSix.style.color = corAtual;
+
+    // Alterar a cor do texto destacado (.marcar)
+    spanS.forEach(function(span) {
+        if (span.style.backgroundColor === corAnterior) {
+            span.style.backgroundColor = corAtual;
+        } else {
+            span.style.backgroundColor = corAnterior;
+        }
+    });
+}
+
+
 entrada.addEventListener('keyup', atualizarTeste)
+reiniciar.addEventListener('click', reiniciarTeste)
+alterarTema.addEventListener('click', alternarTema)
 
 novoTexto();
